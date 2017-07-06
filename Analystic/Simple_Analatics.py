@@ -73,33 +73,3 @@ with tf.Session() as sess:
                       feed_dict={X: content[:100], Y: result[:100]})
    print("\nHypothesis: ", h, "\nCorrect: ", c, "\nAccuracy: ", a)
 
-# x = tf.placeholder(tf.float32, [None, 199])
-# y_ = tf.placeholder(tf.float32, [None, 1])
-#
-# w = tf.Variable(tf.random_normal([199, 1]))
-# b = tf.Variable(tf.random_normal([1]))
-# y = tf.nn.relu(tf.matmul(x, w)+b)
-#
-# cost = -tf.reduce_mean(y_ * tf.log(y) + (1 - y_) * tf.log(1 - y))
-# train = tf.train.GradientDescentOptimizer(0.1).minimize(cost)
-#
-# predicted = tf.cast(y > 0.5, dtype=tf.float32)
-# accuracy = tf.reduce_mean(tf.cast(tf.equal(predicted, y_), dtype=tf.float32))
-#
-# init = tf.global_variables_initializer()
-#
-# with tf.Session() as sess:
-#     sess.run(init)
-#     for i in range(10000):
-#         batch_y, batch_x = train_set
-#         if i%2000 == 0:
-#             print i
-#             print(sess.run((y[:10]), feed_dict={x:batch_x, y_:batch_y}))
-#         # print batch_x.shape, batch_x.dtype
-#         # print batch_y.eval()
-#         # print batch_x
-#         sess.run(train, feed_dict={x:batch_x, y_:batch_y})
-#
-#     # prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
-#     # accuracy = tf.reduce_mean(tf.cast(prediction, tf.float32))
-#     print ('Accuracy:', sess.run((accuracy, y, y_), feed_dict={x:test_set[1], y_:test_set[0]}))
