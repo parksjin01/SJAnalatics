@@ -1,3 +1,8 @@
+# -*- encoding:utf-8 -*-
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 import urllib2
 import BeautifulSoup
 
@@ -12,7 +17,7 @@ def search_onecompany(page):
     exchange, company_ticket = company_ticket.split(', ')[1].strip(')').split(':')
     return [company_name, exchange, company_ticket, last_price.text, quote_change.text, mkt_cap.text]
 
-def Search(company):
+def Search_Google(company):
     page = urllib2.urlopen('https://www.google.com/finance?q=%s&ei=gZpbWYCOJcqX0ASgwbSoAQ' %company).read()
     soup = BeautifulSoup.BeautifulSoup(page)
     result = []
@@ -32,7 +37,33 @@ def Search(company):
         return -1
     return result
 
-res = Search('shinhan')
-for line in res:
-    if line[1] == u'KRX':
-        print '"'+line[2]+'",',
+def Search_Daum(company):
+    base_url = 'http://finance.daum.net/'
+    url = 'http://finance.daum.net/search/search.daum?page=1&col=hname&order=desc&name=%s&nil_stock=refresh'
+    page = urllib2.urlopen(url %company).read()
+    result = []
+    if 'tabSBody1' in page:
+        soup = BeautifulSoup.BeautifulSoup(page)
+        company = BeautifulSoup.BeautifulSoup(str(soup.findAll('table', attrs={'id':'tabSBody1'})[0]))
+        line = company.findAll('tr')[2:]
+        for one in line:
+            try:
+                a = BeautifulSoup.BeautifulSoup(str(one)).findAll('a')[0]
+            except:
+                continue
+            new_page = urllib2.urlopen(base_url+a['href'])
+            title = str(BeautifulSoup.BeautifulSoup(new_page).findAll('div', attrs={'id':'topWrap'})[0])
+            if u'코스피' in title:
+                tmp = BeautifulSoup.BeautifulSoup(str(one)).findAll('td')
+                result.append([tmp[1].text, 'KRX', BeautifulSoup.BeautifulSoup(title).findAll('span', attrs={'class':'stockCode'})[0].text, tmp[2].text, '%s (%s)' %(tmp[3].text, tmp[4].text), 'NaN'])
+    else:
+        info = BeautifulSoup.BeautifulSoup(str(BeautifulSoup.BeautifulSoup(page).findAll('div', attrs={'id':'topWrap'})[0]))
+        price = BeautifulSoup.BeautifulSoup(str(info.findAll('ul', attrs={'class':'list_stockrate'})[0])).findAll('li')
+        result.append([company, 'KRX', info.findAll('span', attrs={'class':'stockCode'})[0].text, price[0].text, '%s (%s)' %(price[1].text, price[2].text), 'NaN'])
+    return result
+
+def Search(company, potal="daum"):
+    if potal.lower() == "daum":
+        return Search_Daum(company)
+    else:
+        return Search_Google(company)
