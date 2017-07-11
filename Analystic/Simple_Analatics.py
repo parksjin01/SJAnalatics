@@ -1,54 +1,67 @@
+# -*- encoding:utf-8 -*-
+
+# 수익률: 3%이상인 모델: 약 94%의 정확도
+# 수익률: 2%이상인 모델: 약 90%의 정확도
+# 수익률: 1%이상인 모델: 약 81%의 정확도
+# 손해율: 1%이상인 모델: 약 64%의 정확도
+# 손해율: 2%이상인 모델: 약 80%의 정확도
+# 손해율: 3%이상인 모델: 약 88%의 정확도
+
 import tensorflow as tf
 import numpy as np
 import cPickle
 
-with open('../Crawling/dataset', 'rb') as f:
-    result, cont = cPickle.load(f)
+def preprocess_dataset(data):
+    dataset = data[0]+data[1]+data[2]+data[3]
+    result = []
+    content = []
+    for data in dataset:
+        for idx in range(len(data)/60+1):
+            try:
+                tmp_period = data[idx*60+3:idx*60+60+3]
+            except:
+                continue
+            period = []
+            for num in tmp_period:
+                period.append(float(num.replace(',', '')))
+            if len(period) < 60:
+                period += [0.0]*(60-len(period))
+            if float(data[idx*60].replace(',', '')) < period[0]*0.97:
+                result.append([1])
+            else:
+                result.append([0])
+            content.append(period)
+    return np.array(result), np.array(content)
 
-# result = tf.one_hot(result, 2, dtype=np.float32)
-tmp = result[::]
-result = []
-for i in tmp:
-    result.append([i])
-result = np.array(result)
-content = []
-for line in cont:
-    tmp = []
-    for num in line:
-        num = num.replace(',', '')
-        tmp.append(float(num))
-    content.append(tmp+[0]*(199-len(tmp)))
-content = np.array(content)
 
-train_set = [result[100:], content[100:]]
-test_set = [result[:100], content[:100]]
+with open('../Util/dataset', 'rb') as f:
+    data = cPickle.load(f)
 
-x_data = content[100:]
-y_data = result[100:]
+result, content = preprocess_dataset(data)
+# print list(result).count([1])
+# print len(result)
+# exit(0)
+train_set = [result[2000:], content[2000:]]
+test_set = [result[:2000], content[:2000]]
+
+x_data = train_set[1]
+y_data = train_set[0]
 X = tf.placeholder(tf.float32)
 Y = tf.placeholder(tf.float32)
 
-W1 = tf.Variable(tf.random_normal([199, 199]))
-b1 = tf.Variable(tf.random_normal([199]))
+W1 = tf.Variable(tf.random_normal([60, 60]))
+b1 = tf.Variable(tf.random_normal([60]))
 layer1 = tf.sigmoid(tf.matmul(X, W1) + b1)
 
-W3 = tf.Variable(tf.random_normal([199, 199]))
-b3 = tf.Variable(tf.random_normal([199]))
+W3 = tf.Variable(tf.random_normal([60, 60]))
+b3 = tf.Variable(tf.random_normal([60]))
 layer2 = tf.sigmoid(tf.matmul(layer1, W3)+b3)
 
-W4 = tf.Variable(tf.random_normal([199, 199]))
-b4 = tf.Variable(tf.random_normal([199]))
+W4 = tf.Variable(tf.random_normal([60, 60]))
+b4 = tf.Variable(tf.random_normal([60]))
 layer3 = tf.sigmoid(tf.matmul(layer2, W4)+b4)
 
-# W5 = tf.Variable(tf.random_normal([199, 199]))
-# b5 = tf.Variable(tf.random_normal([199]))
-# layer4 = tf.sigmoid(tf.matmul(layer3, W5)+b5)
-#
-# W6 = tf.Variable(tf.random_normal([199, 199]))
-# b6 = tf.Variable(tf.random_normal([199]))
-# layer5 = tf.sigmoid(tf.matmul(layer4, W6)+b6)
-
-W2 = tf.Variable(tf.random_normal([199, 1]), name='weight2')
+W2 = tf.Variable(tf.random_normal([60, 1]), name='weight2')
 b2 = tf.Variable(tf.random_normal([1]), name='bias2')
 hypothesis = tf.sigmoid(tf.matmul(layer3, W2) + b2)
 
@@ -70,6 +83,7 @@ with tf.Session() as sess:
 
    # Accuracy report
    h, c, a = sess.run([hypothesis, predicted, accuracy],
-                      feed_dict={X: content[:100], Y: result[:100]})
+                      feed_dict={X: test_set[1], Y: test_set[0]})
    print("\nHypothesis: ", h, "\nCorrect: ", c, "\nAccuracy: ", a)
 
+print list(test_set[0]).count([1])
