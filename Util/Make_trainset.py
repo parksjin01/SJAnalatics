@@ -111,6 +111,5 @@ def make_set(num, duration):
     with open('dataset', 'wb') as f:
         cPickle.dump(res, f)
 
-make_set(1000, 300)
 # print crawl_stock('005930', 60)
 # print crawl_stock_daily('005930', 60)
