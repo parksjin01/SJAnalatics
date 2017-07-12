@@ -114,7 +114,7 @@ Company_id | Stock_code | Company_name | Correction
     뿐이다. 그러나 만약 하락한 것을 상승했다고 틀리게 예측해버리면 문제가 된다. 만약 어떤 회사의 주가가
     실제로는 3%가까이 떨어졌음에도 상승했다고 예측한다면 팔 시기를 놓쳐서 큰 손해를 입게된다. 다행이도 20개의
     틀린 케이스중 떨어진것을 올랐다고 착각하는 것은 `27번 넷마블 게임` 뿐이다. 그리고 틀린 케이스를 보면 대부분
-    ![Image of Yaktocat](https://www.google.co.kr/url?sa=i&rct=j&q=&esrc=s&source=images&cd=&cad=rja&uact=8&ved=0ahUKEwjD-J_Lw4PVAhXFE7wKHfkFDgsQjRwIBw&url=http%3A%2F%2Fwww.ohmynews.com%2FNWS_Web%2FView%2Fat_pg.aspx%3FCNTN_CD%3DA0001828171&psig=AFQjCNEwKqK6nmQH9-d0oCfeM-ENhLEOQw&ust=1499941481399780)
+    ![Image of Yaktocat](http://ojsfile.ohmynews.com/STD_IMG_FILE/2013/0124/IE001542453_STD.jpg)
     이런식으로 가운데만 볼록하다던가, 꾸준히 하락세를 그리다가 잠깐 반등한 경우가 많았다. 또한 :star: 이 표시된
     회사를 보면 상승세중 갑작이 급등했을때도 틀린 결과를 보여주는 것을 알수 있다. 물론 약 3개 정도의 케이스는 특별한
     이유없이 틀린 결과를 내는것 같은데 이는 사용한 모델의 한계라고 생각된다. 반대로 유일하게 상승한 케이스를 제대로 맞힌
